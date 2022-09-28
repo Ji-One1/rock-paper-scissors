@@ -11,17 +11,32 @@ function getComputerChoice(){
 }
 
 function getPlayerSelection(){
-    let playerSelection = prompt("Please enter your selection").toLowerCase();
-    return playerSelection.charAt(0).toUpperCase() + playerSelection.slice(1);
+    buttons = document.querySelectorAll("button");
+    var playerSelection;
+    buttons.forEach((button) => {
+        button.addEventListener('click', function(e) {
+            if (e.target.id == 'rock'){
+                console.log('he');
+                playerSelection = 'Rock';
+            }
+            else if(e.target.id == 'paper'){
+                playerSelection =  'Paper';
+            }
+            else{
+                playerSelection =  'Scissors';
+            }
+        });
+    })
+    return playerSelection
 }
 
 
 function displayRoundWinner(playerWins, computerChoice, playerSelection){
     let endRoundMessage;
-    if (playerWins === true){
+    if (playerWins == 'win'){
         endRoundMessage = `You Win! ${playerSelection} beats ${computerChoice}`;
     }
-    else if(playerWins === false){
+    else if(playerWins == 'lose'){
         endRoundMessage = `You Lose! ${computerChoice} beats ${playerSelection}`;
     }
     else{
@@ -30,54 +45,70 @@ function displayRoundWinner(playerWins, computerChoice, playerSelection){
     return endRoundMessage
 }
 
-function displayGameWinner(currentScore){
-    if  (currentScore > 0){
-        return "Game Over! You Won!";
-    }
-    else if (currentScore < 0){
-        return "Game Over! You Lost!";
-    }
-    else{
-        return "The Game is a Tie" ;
-    }
+function getCurrentScore(playerScore,computerScore){
+    return `Player: ${playerScore}          Computer: ${computerScore}` 
 }
 
 function playRound(computerChoice, playerSelection){
     if (computerChoice == playerSelection){  
-        return displayRoundWinner(undefined, computerChoice, playerSelection);
+        return displayRoundWinner('tie', computerChoice, playerSelection);
     }
     else if (computerChoice == 'Rock' && playerSelection == 'Scissors'){
-        currentScore -= 1;
-        return displayRoundWinner(false, computerChoice, playerSelection);
+        computerScore += 1;
+        return displayRoundWinner('lose', computerChoice, playerSelection);
     }
     else if (computerChoice == 'Paper' && playerSelection == 'Rock'){
-        currentScore -= 1;
-        return displayRoundWinner(false, computerChoice, playerSelection);
+        computerScore += 1;
+        return displayRoundWinner('lose', computerChoice, playerSelection);
     }
     else if(computerChoice == 'Scissors' && playerSelection == 'Paper'){
-        currentScore -= 1;
-        return displayRoundWinner(false, computerChoice, playerSelection);
+        computerScore += 1;
+        return displayRoundWinner('lose', computerChoice, playerSelection);
     }
     else{
-        currentScore += 1;
-        return displayRoundWinner(true, computerChoice, playerSelection);
+        playerScore += 1;
+        return displayRoundWinner('win', computerChoice, playerSelection);
     }
     
 }
 
-function game(){
 
-    for (let i = 0; i < 5; i++){
-        computerChoice = getComputerChoice();
-        playerSelection = getPlayerSelection();
-        console.log(playRound(computerChoice, playerSelection));
-    }
-    console.log(displayGameWinner(currentScore));
+function endGame(winner){
+    displayBox.textContent = `${winner} wins!`
 }
 
-var currentScore = 0;
-game()
 
 
 
 
+var playerScore = 0;
+var computerScore = 0;
+displayBox = document.querySelector(".display-winner");
+scoreBox = document.querySelector(".display-score")
+
+buttons = document.querySelectorAll("button");
+var playerSelection;
+buttons.forEach((button) => {
+    button.addEventListener('click', (e) => {
+        if (e.target.id == 'rock'){
+            playerSelection = 'Rock';
+        }
+        else if(e.target.id == 'paper'){
+            playerSelection =  'Paper';
+        }
+        else{
+            playerSelection =  'Scissors';
+        }
+        computerChoice = getComputerChoice();
+        roundText = playRound(computerChoice, playerSelection);
+        displayBox.textContent = roundText;
+        scoreText = getCurrentScore(playerScore, computerScore);
+        scoreBox.textContent = scoreText
+        if (playerScore == 5){
+            endGame('Player')
+        }
+        else if(computerScore == 5){
+            endGame('Computer')
+        }
+        })
+    });
